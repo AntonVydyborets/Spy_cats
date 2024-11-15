@@ -1,5 +1,5 @@
 import httpx
-from pydantic import BaseModel, validators, Field
+from pydantic import BaseModel, validator, Field
 from typing import List, Optional
 
 
@@ -9,14 +9,19 @@ class CreateSpyCat(BaseModel):
     breed: str
     salary: float
 
-    @validators("breed")
+    @validator("breed")
     def validate_breed(cls, breed):
         with httpx.Client() as client:
             response = client.get(f"https://api.thecatapi.com/v1/breeds")
-        if not response.json():
+        if not response.json() or breed not in [breed_data['name'] for breed_data in response.json()]:
             raise ValueError("Wrong breed")
         return breed
 
+class CatUpdate(BaseModel):
+    salary: float
+
+    class Config:
+        orm_mode = True
 
 class CreateTarget(BaseModel):
     name: str

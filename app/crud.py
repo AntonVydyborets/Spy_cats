@@ -1,7 +1,7 @@
 from fastapi import Depends, HTTPException, APIRouter, status
-from database import get_db
-from models import SpyCats, Mission, Target
-from schemas import CreateSpyCat, CreateMission
+from .database import get_db
+from .models import SpyCats, Mission, Target
+from .schemas import CreateSpyCat, CreateMission, CatUpdate
 from sqlalchemy.orm import Session
 
 router = APIRouter()
@@ -9,11 +9,35 @@ router = APIRouter()
 
 @router.post("/cats/", response_model=CreateSpyCat)
 def create_cat(cat: CreateSpyCat, db: Session = Depends(get_db)):
-    db_cat = SpyCats(**cat.model_dump())
+    db_cat = SpyCats(**cat.dict())
     db.add(db_cat)
     db.commit()
-    db.refresh()
+    db.refresh(db_cat)
     return db_cat
+
+
+def update_cat_salary(db: Session, cat_id: int, cat_update: CatUpdate):
+    cat = db.query(SpyCats).filter(SpyCats.id == cat_id).first()
+    if not cat:
+        return None 
+    cat.salary = cat_update.salary
+    db.commit()
+    db.refresh(cat)  
+    
+    return cat
+
+@router.put("/cats/{cat_id}/salary", response_model=CatUpdate)
+def update_salary(
+    cat_id: int, 
+    cat_update: CatUpdate, 
+    db: Session = Depends(get_db)
+):
+    cat = update_cat_salary(db, cat_id, cat_update)
+    
+    if not cat:
+        raise HTTPException(status_code=404, detail="Cat not found")
+    
+    return cat
 
 
 @router.get("/cats/")
@@ -52,10 +76,10 @@ def create_mission(mission: CreateMission, db: Session = Depends(get_db)):
     if active_mission:
         raise HTTPException(status_code=400, detail="This cat already has an active mission.")
 
-    db_mission = Mission(cat_id=mission.cat_id, complete=mission.complete)
+    db_mission = Mission(cat_id=mission.cat_id, complete=mission.complete or False)
     db.add(db_mission)
     db.commit()
-    db.refresh()
+    db.refresh(db_mission)
 
     for target_data in mission.targets:
         db_target = Target(**target_data, mission_id=db_mission.id)
@@ -87,7 +111,7 @@ def complete_mission(mission_id: int, db: Session = Depends(get_db)):
     if mission.complete:
         raise HTTPException(status_code=400, detail="Mission is completed already")
 
-    mission.complete = True
+    mission.complete = 1
     for target in mission.targets:
         if target.complete:
             target.notes = "Notes are frozen, updates are forbidden"

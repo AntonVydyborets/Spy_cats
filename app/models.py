@@ -1,6 +1,6 @@
-from sqlalchemy import Column, Integer, String, Boolean, Float, Text
+from sqlalchemy import Column, Integer, String, Boolean, Float, Text, ForeignKey
 from sqlalchemy.orm import relationship
-from app.database import Base
+from .database import Base
 
 
 class SpyCats(Base):
@@ -12,17 +12,17 @@ class SpyCats(Base):
     breed = Column(String, nullable=False)
     salary = Column(Float, nullable=False)
 
-    mission = relationship("Mission", back_populates="cat")
+    missions = relationship("Mission", back_populates="cat")
 
 
 class Mission(Base):
     __tablename__ = "missions"
 
     id = Column(Integer, primary_key=True, index=True)
-    cat_id = Column(Integer, ForeignKey="spy_cats.id")
-    complete = Column(Boolean, default=False)
+    cat_id = Column(Integer, ForeignKey("spy_cats.id"))
+    complete = Column(Integer, default=0) 
     cat = relationship("SpyCats", back_populates="missions")
-    targets = relationship("Target", back_populates="mission")
+    targets = relationship("Target", back_populates="mission", primaryjoin="Mission.id == Target.mission_id")
 
 
 class Target(Base):
@@ -31,7 +31,7 @@ class Target(Base):
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, nullable=False)
     country = Column(String, nullable=False)
-    complete = Column(Boolean, default=True)
-    mission_id = Column(Integer, ForeignKey="mission.id")
+    complete = Column(Integer, default=0) 
+    mission_id = Column(Integer, ForeignKey("missions.id"))
     notes = Column(Text, nullable=True)
     mission = relationship("Mission", back_populates="targets")
