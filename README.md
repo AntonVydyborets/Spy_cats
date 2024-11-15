@@ -39,3 +39,6 @@ Once the setup is complete, start the FastAPI server:
 bash
 uvicorn main:app --reload
 Your FastAPI server should now be running at http://localhost:8000.
+
+Postman collection you can find in app dir - https://github.com/AntonVydyborets/Spy_cats/blob/main/Spy%20cats.postman_collection.json
+
