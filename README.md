@@ -11,14 +11,12 @@ Step 1: Clone the repository
 Clone this repository to your local machine using Git:
 
 bash
-Копіювати код
-git clone https://github.com/yourusername/spy-cat-agency.git
-cd spy-cat-agency
+git clone https://github.com/AntonVydyborets/Spy_cats.git
+cd Spy_cats
 Step 2: Install dependencies
 Create a virtual environment and install required dependencies:
 
 bash
-Копіювати код
 python -m venv env
 source env/bin/activate  # For Mac/Linux
 env\Scripts\activate  # For Windows
@@ -34,12 +32,10 @@ Step 4: Run database migrations
 Run the database migrations to create the required tables:
 
 bash
-Копіювати код
 alembic upgrade head
 Step 5: Start the FastAPI server
 Once the setup is complete, start the FastAPI server:
 
 bash
-Копіювати код
 uvicorn main:app --reload
 Your FastAPI server should now be running at http://localhost:8000.
