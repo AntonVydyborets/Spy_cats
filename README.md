@@ -26,7 +26,6 @@ Step 3: Configure PostgreSQL
 Make sure your PostgreSQL database is set up. You can use a local or remote PostgreSQL instance. Create a database for the project and update the DATABASE_URL in database.py with the connection string to your database:
 
 python
-Копіювати код
 DATABASE_URL = "postgresql://user:password@localhost/spy_cat_agency"
 Step 4: Run database migrations
 Run the database migrations to create the required tables:
